@@ -17,15 +17,9 @@ usermod  -o -u "$PUID" hytale
 chown -R "$PUID:$PGID" /home/hytale /data 2>/dev/null || true
 
 init_server() {
-  DATA_DIR="/data"
-  GAME_SERVER_DIR="$DATA_DIR/server"
+  SERVER_DIR="/data"
 
-  if [ -f "$GAME_SERVER_DIR/HytaleServer.jar" ]; then
-    echo "Servidor já instalado."
-  else
-    echo "Servidor não encontrado, iniciando download..."
-    download_server
-  fi
+  check_server
 }
 
 init_server

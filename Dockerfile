@@ -15,7 +15,7 @@ ENV PUID=1000 \
     DOWNLOAD_ON_START=true
 
 COPY ./scripts /home/hytale/scripts
-COPY ./hytale_downloader /home/hytale/downloader
+COPY ./hytale_downloader /home/hytale/downloader/hytale_downloader
 
 RUN chmod +x /home/hytale/scripts/*.sh && \
     chown -R 1000:1000 /home/hytale
