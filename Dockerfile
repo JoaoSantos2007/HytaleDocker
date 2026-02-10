@@ -12,7 +12,11 @@ RUN userdel -r ubuntu 2>/dev/null || true && \
 
 ENV PUID=1000 \
     PGID=1000 \
-    DOWNLOAD_ON_START=true
+    DOWNLOAD_ON_START=true \
+    SERVER_DIR="/data" \
+    DOWNLOADER_DIR="/home/hytale/downloader" \
+    GAME_DOWNLOAD_DIR="/home/hytale/game" \
+    DOWNLOADER_CMD="./hytale_downloader"
 
 COPY ./scripts /home/hytale/scripts
 COPY ./hytale_downloader /home/hytale/downloader/hytale_downloader

@@ -1,0 +1,19 @@
+services:
+  hytale:
+    build: .
+    container_name: hytale
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+    ports:
+      - 5520:5520/udp
+    
+    volumes:
+      - ./test:/data
+
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - DOWNLOAD_ON_START=true
+    stdin_open: true
+    tty: true
