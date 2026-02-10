@@ -16,7 +16,22 @@ ENV PUID=1000 \
     SERVER_DIR="/data" \
     DOWNLOADER_DIR="/home/hytale/downloader" \
     GAME_DOWNLOAD_DIR="/home/hytale/game" \
-    DOWNLOADER_CMD="./hytale_downloader"
+    DOWNLOADER_CMD="./hytale_downloader" \
+    PORT=5520 \
+    SERVER_NAME=hytale-server \
+    MAX_PLAYERS=20 \
+    VIEW_DISTANCE=12 \
+    ENABLE_BACKUPS=true \
+    BACKUP_FREQUENCY=30 \
+    BACKUP_DIR=/data/backups \
+    DISABLE_SENTRY=true \
+    USE_AOT_CACHE=true \
+    AUTH_MODE=authenticated \
+    ACCEPT_EARLY_PLUGINS=false \
+    MAX_MEMORY=8192 \
+    SESSION_TOKEN="" \
+    IDENTITY_TOKEN="" \
+    OWNER_UUID=""
 
 COPY ./scripts /home/hytale/scripts
 COPY ./hytale_downloader /home/hytale/downloader/hytale_downloader
@@ -29,5 +44,11 @@ WORKDIR /home/hytale
 VOLUME ["/data"]
 
 EXPOSE 5520
+
+# Health check to ensure the server is running
+HEALTHCHECK --start-period=5m \
+            --interval=30s \
+            --timeout=10s \
+            CMD pgrep -f "HytaleServer.jar" > /dev/null || exit 1
 
 ENTRYPOINT ["/home/hytale/scripts/init.sh"]

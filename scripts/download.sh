@@ -48,6 +48,7 @@ download_server() {
   fi
 
   # Get version if we don't have it yet (first boot)
+  cd "$DOWNLOADER_DIR" || exit 1
   if [ -z "$latest_version" ]; then
     latest_version=$(eval "$DOWNLOADER_CMD -print-version" 2>/dev/null)
   fi
@@ -76,7 +77,6 @@ check_server() {
   mkdir -p "$GAME_DOWNLOAD_DIR"
   mkdir -p "$SERVER_DIR"
 
-
   # Sync credentials file in volume with container downloader
   if [ -f "$CREDENTIALS_FILE_SERVER" ]; then
     cp -f "$CREDENTIALS_FILE_SERVER" "$CREDENTIALS_FILE_DOWNLOADER"
@@ -98,10 +98,12 @@ check_server() {
     return 0
   fi
 
+
   cd "$DOWNLOADER_DIR" || exit 1
 
   # Get latest version
   latest_version=$(eval "$DOWNLOADER_CMD -print-version" 2>/dev/null)
+  echo "$latest_version"
   if [ -z "$latest_version" ]; then
     echo "Failed to get latest version"
     return 1
