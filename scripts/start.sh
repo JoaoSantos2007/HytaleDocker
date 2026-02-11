@@ -3,9 +3,6 @@ cd "$SERVER_DIR" || exit
 
 # Set defaults if not provided
 PORT="${PORT:-5520}"
-SERVER_NAME="${SERVER_NAME:-hytale-server}"
-MAX_PLAYERS="${MAX_PLAYERS:-20}"
-VIEW_DISTANCE="${VIEW_DISTANCE:-12}"
 ENABLE_BACKUPS="${ENABLE_BACKUPS:-false}"
 BACKUP_FREQUENCY="${BACKUP_FREQUENCY:-30}"
 BACKUP_DIR="${BACKUP_DIR:-/data/backups}"
@@ -13,10 +10,10 @@ DISABLE_SENTRY="${DISABLE_SENTRY:-true}"
 USE_AOT_CACHE="${USE_AOT_CACHE:-true}"
 AUTH_MODE="${AUTH_MODE:-authenticated}"
 ACCEPT_EARLY_PLUGINS="${ACCEPT_EARLY_PLUGINS:-false}"
-MAX_MEMORY="${MAX_MEMORY:-2048}"
+MAX_MEMORY="${MAX_MEMORY:-2048M}"
 
 # Check if HytaleServer.jar exists
-SERVER_JAR="$SERVER_DIR/HytaleServer.jar"
+SERVER_JAR="$SERVER_DIR/Server/HytaleServer.jar"
 if [ ! -f "$SERVER_JAR" ]; then
     echo "Please ensure the server files are properly downloaded."
     exit 1
@@ -25,12 +22,12 @@ fi
 echo "Starting Hytale Dedicated Server on port ${PORT}"
 
 # Build the startup command
-JVM_MEMORY="-Xmx2G"
+JVM_MEMORY="-Xmx$MAX_MEMORY"
 STARTUP_CMD="java ${JVM_MEMORY}"
 
 # Add AOT cache if enabled
-if [ "${USE_AOT_CACHE}" = "true" ] && [ -f "${SERVER_DIR}/HytaleServer.aot" ]; then
-    STARTUP_CMD="${STARTUP_CMD} -XX:AOTCache=${SERVER_DIR}/HytaleServer.aot"
+if [ "${USE_AOT_CACHE}" = "true" ] && [ -f "${SERVER_DIR}/Server/HytaleServer.aot" ]; then
+    STARTUP_CMD="${STARTUP_CMD} -XX:AOTCache=${SERVER_DIR}/Server/HytaleServer.aot"
     echo "Using AOT cache for faster startup"
 fi
 

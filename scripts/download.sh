@@ -2,7 +2,6 @@
 
 SERVER_DIR="${SERVER_DIR:-/data}"
 DOWNLOADER_DIR="${DOWNLOADER_DIR:-/home/hytale/downloader}"
-GAME_DOWNLOAD_DIR="${GAME_DOWNLOAD_DIR:-/home/hytale/game}"
 DOWNLOADER_CMD="${DOWNLOADER_CMD:-./hytale_downloader}"
 CREDENTIALS_FILE_SERVER="$SERVER_DIR/credentials.json"
 CREDENTIALS_FILE_DOWNLOADER="$DOWNLOADER_DIR/.hytale-downloader-credentials.json"
@@ -16,7 +15,7 @@ download_server() {
   cd "$DOWNLOADER_DIR" || exit 1
 
   # Download game.zip
-  eval "$DOWNLOADER_CMD -download-path '$GAME_DOWNLOAD_DIR/game.zip'" || {
+  eval "$DOWNLOADER_CMD -download-path '$SERVER_DIR/game.zip'" || {
     echo "Failed to download server files"
     return 1
   }
@@ -29,20 +28,15 @@ download_server() {
   
   # Extract the files
   echo "Extracting server files..."
-  cd "$GAME_DOWNLOAD_DIR" || exit 1
+  cd "$SERVER_DIR" || exit 1
   unzip -o -q game.zip || {
     echo "Failed to extract server files"
     return 1
   }
   rm game.zip
-
-  # Copy game files to 
-  cp -f "$GAME_DOWNLOAD_DIR/Assets.zip" "$SERVER_DIR/Assets.zip"
-  cp -f "$GAME_DOWNLOAD_DIR/Server/HytaleServer.jar" "$SERVER_DIR/HytaleServer.jar"
-  cp -f "$GAME_DOWNLOAD_DIR/Server/HytaleServer.aot" "$SERVER_DIR/HytaleServer.aot"
   
   # Verify files exist
-  if [ ! -f "$SERVER_DIR/HytaleServer.jar" ]; then
+  if [ ! -f "$SERVER_DIR/Server/HytaleServer.jar" ]; then
     echo "HytaleServer.jar not found after download"
     return 1
   fi
@@ -55,9 +49,9 @@ download_server() {
 
   # Remove outdated AOT cache only if this was an update
   if [ -n "$current_version" ] && [ "$current_version" != "$latest_version" ]; then
-    if [ -f "$SERVER_DIR/HytaleServer.aot" ]; then
+    if [ -f "$SERVER_DIR/Server/HytaleServer.aot" ]; then
       echo "Removing outdated AOT cache file (HytaleServer.aot) after update"
-      rm -f "$SERVER_DIR/HytaleServer.aot"
+      rm -f "$SERVER_DIR/Server/HytaleServer.aot"
     fi
   fi
 
@@ -74,7 +68,6 @@ check_server() {
   echo "Checking server version..."
 
   mkdir -p "$DOWNLOADER_DIR"
-  mkdir -p "$GAME_DOWNLOAD_DIR"
   mkdir -p "$SERVER_DIR"
 
   # Sync credentials file in volume with container downloader
@@ -109,6 +102,11 @@ check_server() {
     return 1
   fi
 
+  # Copy downloader credentials to volume
+  if [ -f "$CREDENTIALS_FILE_DOWNLOADER" ]; then
+    cp -f "$CREDENTIALS_FILE_DOWNLOADER" "$CREDENTIALS_FILE_SERVER"
+  fi
+
   # Get current installed version
   if [ -f "$VERSION_FILE_DOWNLOADER" ]; then
     current_version=$(cat "$VERSION_FILE_DOWNLOADER")
@@ -117,13 +115,13 @@ check_server() {
   fi
 
   # Already up to date
-  if [ -f "$SERVER_DIR/HytaleServer.jar" ] && [ "$current_version" = "$latest_version" ]; then
+  if [ -f "$SERVER_DIR/Server/HytaleServer.jar" ] && [ "$current_version" = "$latest_version" ]; then
     echo "Server is up to date (version $latest_version)"
     return 0
   fi
 
   # Needs install/update
-  if [ -f "$SERVER_DIR/HytaleServer.jar" ]; then
+  if [ -f "$SERVER_DIR/Server/HytaleServer.jar" ]; then
     echo "Update available: $current_version -> $latest_version"
   else
     echo "Server not installed"
